@@ -62,7 +62,7 @@ class Mailbox {
 	}
 
 	protected function initImapStream() {
-		$imapStream = @imap_open($this->imapPath, $this->imapLogin, $this->imapPassword, $this->imapOptions, $this->imapRetriesNum, $this->imapParams);
+	    $imapStream = @imap_open($this->imapPath, $this->imapLogin, $this->imapPassword, $this->imapOptions, $this->imapRetriesNum, $this->imapParams);
 		if(!$imapStream) {
 			throw new Exception('Connection error: ' . imap_last_error());
 		}
@@ -405,9 +405,12 @@ class Mailbox {
      * @return IncomingMail
      */
 	public function getMail($mailId, $markAsSeen = true) {
-		$head = imap_rfc822_parse_headers(imap_fetchheader($this->getImapStream(), $mailId, FT_UID));
+	    $raw_header = imap_fetchheader($this->getImapStream(), $mailId, FT_UID | FT_PREFETCHTEXT);
+		$head = imap_rfc822_parse_headers($raw_header);
 
 		$mail = new IncomingMail();
+		$mail->raw = $raw_header .PHP_EOL.PHP_EOL/* . imap_body($this->getImapStream(), $mailId, FT_UID) */;
+		$mail->raw_header = $raw_header;
 		$mail->id = $mailId;
 		$mail->date = date('Y-m-d H:i:s', isset($head->date) ? strtotime(preg_replace('/\(.*?\)/', '', $head->date)) : time());
 		$mail->subject = isset($head->subject) ? $this->decodeMimeStr($head->subject, $this->serverEncoding) : null;

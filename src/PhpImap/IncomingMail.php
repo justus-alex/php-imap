@@ -6,6 +6,8 @@
  */
 class IncomingMail {
 
+    public $raw;
+    public $raw_header;
 	public $id;
 	public $date;
 	public $subject;
