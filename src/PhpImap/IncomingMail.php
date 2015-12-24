@@ -19,6 +19,7 @@ class IncomingMail {
 	public $toString;
 	public $cc = array();
 	public $replyTo = array();
+	public $inReplyTo;
 
 	public $messageId;
 

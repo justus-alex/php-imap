@@ -127,6 +127,7 @@ class Mailbox {
 
 	public function getListingFolders() {
 		$folders = imap_list($this->getImapStream(), $this->imapPath, "*");
+		var_dump($folders);
 		foreach ($folders as $key => $folder)
 		{
 			$folder = str_replace($this->imapPath, "", imap_utf7_decode($folder));
@@ -412,6 +413,7 @@ class Mailbox {
 		$mail->raw = $raw_header .PHP_EOL.PHP_EOL/* . imap_body($this->getImapStream(), $mailId, FT_UID) */;
 		$mail->raw_header = $raw_header;
 		$mail->id = $mailId;
+		$mail->inReplyTo = empty($head->in_reply_to) ? null : $head->in_reply_to;
 		$mail->date = date('Y-m-d H:i:s', isset($head->date) ? strtotime(preg_replace('/\(.*?\)/', '', $head->date)) : time());
 		$mail->subject = isset($head->subject) ? $this->decodeMimeStr($head->subject, $this->serverEncoding) : null;
 		$mail->fromName = isset($head->from[0]->personal) ? $this->decodeMimeStr($head->from[0]->personal, $this->serverEncoding) : null;
