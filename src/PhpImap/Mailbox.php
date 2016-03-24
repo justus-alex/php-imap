@@ -127,7 +127,6 @@ class Mailbox {
 
 	public function getListingFolders() {
 		$folders = imap_list($this->getImapStream(), $this->imapPath, "*");
-		var_dump($folders);
 		foreach ($folders as $key => $folder)
 		{
 			$folder = str_replace($this->imapPath, "", imap_utf7_decode($folder));
@@ -408,9 +407,9 @@ class Mailbox {
 	public function getMail($mailId, $markAsSeen = true) {
 	    $raw_header = imap_fetchheader($this->getImapStream(), $mailId, FT_UID | FT_PREFETCHTEXT);
 		$head = imap_rfc822_parse_headers($raw_header);
-
+		$raw_header = rtrim($raw_header);
 		$mail = new IncomingMail();
-		$mail->raw = $raw_header .PHP_EOL.PHP_EOL/* . imap_body($this->getImapStream(), $mailId, FT_UID) */;
+		$mail->raw = $raw_header ."\r\n\r\n". imap_body($this->getImapStream(), $mailId, FT_UID | FT_PEEK);
 		$mail->raw_header = $raw_header;
 		$mail->id = $mailId;
 		$mail->inReplyTo = empty($head->in_reply_to) ? null : $head->in_reply_to;
